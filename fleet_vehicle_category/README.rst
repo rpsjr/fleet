@@ -58,6 +58,11 @@ Changelog
 
 - [MIG] Module Migration
 
+17.0.1.0.0 (2024-12-31)
+-----------------------
+
+- [MIG] Module Migration
+
 Bug Tracker
 ===========
 
@@ -84,6 +89,8 @@ Contributors
 - `Escodoo <https://www.escodoo.com.br>`__:
 
   - Marcel Savegnago <marcel.savegnago@escodoo.com.br>
+
+- `Heliconia Solutions Pvt. Ltd. <https://www.heliconia.io>`__
 
 Maintainers
 -----------
