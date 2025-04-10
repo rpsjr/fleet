@@ -66,11 +66,6 @@ msgid "ID"
 msgstr ""
 
 #. module: fleet_vehicle_category
-#: model:ir.model.fields,field_description:fleet_vehicle_category.field_fleet_vehicle_category____last_update
-msgid "Last Modified on"
-msgstr ""
-
-#. module: fleet_vehicle_category
 #: model:ir.model.fields,field_description:fleet_vehicle_category.field_fleet_vehicle_category__write_uid
 msgid "Last Updated by"
 msgstr ""
