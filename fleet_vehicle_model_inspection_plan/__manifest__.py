@@ -12,6 +12,7 @@
     "depends": ["fleet", "fleet_vehicle_inspection"],  # Dependência crucial da OCA
     "data": [
         "security/ir.model.access.csv",
+        "wizards/inspection_plan_import_export_views.xml",
         "views/fleet_vehicle_model_views.xml",
         "views/fleet_vehicle_model_inspection_plan_menus.xml",
     ],
