@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<odoo>
-    <!-- Creating local demo items to ensure they exist regardless of fleet_vehicle_inspection demo status -->
-    <record id="demo_inspection_item_oil" model="fleet.vehicle.inspection.item">
-        <field name="name">Oil Check</field>
-    </record>
-    
-    <record id="demo_inspection_item_tires" model="fleet.vehicle.inspection.item">
-        <field name="name">Tire Pressure</field>
-    </record>
-
+<odoo noupdate="1">
     <!-- Inspection Plans -->
-    <!-- Using generic vehicle models if possible, or relying on fleet demo data -->
     <record
         id="fleet_vehicle_model_inspection_plan_demo_1"
         model="fleet.vehicle.model.inspection.plan"
     >
-        <!-- Tries to use Opel Corsa from fleet demo data -->
         <field name="model_id" ref="fleet.model_opel_corsa" />
-        <field name="item_id" ref="demo_inspection_item_oil" />
+        <field
+            name="item_id"
+            ref="fleet_vehicle_inspection.fleet_vehicle_inspection_item_demo_1"
+        />
         <field name="interval_km">10000</field>
         <field name="interval_months">12</field>
     </record>
@@ -27,19 +19,24 @@
         model="fleet.vehicle.model.inspection.plan"
     >
         <field name="model_id" ref="fleet.model_opel_corsa" />
-        <field name="item_id" ref="demo_inspection_item_tires" />
-        <field name="interval_km">5000</field>
-        <field name="interval_months">6</field>
+        <field
+            name="item_id"
+            ref="fleet_vehicle_inspection.fleet_vehicle_inspection_item_demo_2"
+        />
+        <field name="interval_km">15000</field>
+        <field name="interval_months">24</field>
     </record>
     
     <record
         id="fleet_vehicle_model_inspection_plan_demo_3"
         model="fleet.vehicle.model.inspection.plan"
     >
-        <!-- Tries to use Audi A1 from fleet demo data -->
         <field name="model_id" ref="fleet.model_audi_a1" />
-        <field name="item_id" ref="demo_inspection_item_oil" />
-        <field name="interval_km">15000</field>
+        <field
+            name="item_id"
+            ref="fleet_vehicle_inspection.fleet_vehicle_inspection_item_demo_1"
+        />
+        <field name="interval_km">12000</field>
         <field name="interval_months">12</field>
     </record>
 </odoo>
