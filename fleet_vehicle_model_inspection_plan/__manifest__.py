@@ -16,4 +16,7 @@
         "views/fleet_vehicle_model_views.xml",
         "views/fleet_vehicle_model_inspection_plan_menus.xml",
     ],
+    "demo": [
+        "demo/fleet_vehicle_model_inspection_plan_demo.xml",
+    ],
 }
