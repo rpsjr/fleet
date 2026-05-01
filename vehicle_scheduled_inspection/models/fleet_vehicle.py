@@ -59,7 +59,7 @@ class FleetVehicle(models.Model):
                 last_line = self.env["fleet.vehicle.inspection.line"].search(
                     [
                         ("inspection_id.vehicle_id", "=", vehicle.id),
-                        ("item_id", "=", plan.item_id.id),
+                        ("inspection_item_id", "=", plan.item_id.id),
                         ("inspection_id.state", "!=", "cancel"),
                     ],
                     order="create_date desc",
@@ -103,7 +103,7 @@ class FleetVehicle(models.Model):
                         "note": note_html,
                         "odometer": vehicle.odometer,
                         "inspection_line_ids": [
-                            (0, 0, {"item_id": item.id}) for item in unique_items
+                            (0, 0, {"inspection_item_id": item.id}) for item in unique_items
                         ],
                     }
                 )
