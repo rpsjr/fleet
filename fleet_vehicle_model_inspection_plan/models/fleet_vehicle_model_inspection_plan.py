@@ -26,6 +26,13 @@ class FleetVehicleModelInspectionPlan(models.Model):
         default=10000,
     )
 
+    criticality = fields.Selection(
+        [("baixa", "Baixa"), ("media", "Média"), ("alta", "Alta")],
+        string="Criticidade",
+        default="alta",
+        required=True,
+    )
+
     interval_months = fields.Integer(
         string="Interval (Months)",
         help="Interval in months between inspections for this item.",
