@@ -1,15 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data noupdate="1">
         <!-- WhatsApp Template -->
-        <record id="wa_template_convite_manutencao_programada" model="whatsapp.template">
+        <record
+            id="wa_template_convite_manutencao_programada"
+            model="whatsapp.template"
+        >
             <field name="name">convite_manutencao_programada</field>
-            <field name="model_id" ref="fleet_vehicle_inspection.model_fleet_vehicle_inspection"/>
-            <field name="body"><![CDATA[Olá, {{1}}!
+            <field
+                name="model_id"
+                ref="fleet_vehicle_inspection.model_fleet_vehicle_inspection"
+            />
+            <field
+                name="body"
+            ><![CDATA[Olá, {{1}}!
 
 🚙  {{2}}!
 
-🧰 Está na hora da revisão programada de {{3}}km! 
+🧰 Está na hora da revisão programada de {{3}}km!
 
 Data: {{4}}
 Hora: 7h30 às 11h
@@ -28,30 +36,36 @@ Itens de manutenção:
         <!-- Email Template -->
         <record id="mail_template_convite_manutencao_programada" model="mail.template">
             <field name="name">Convite de Manutenção Programada</field>
-            <field name="model_id" ref="fleet_vehicle_inspection.model_fleet_vehicle_inspection"/>
-            <field name="subject">Manutenção Programada: {{ object.vehicle_id.name }}</field>
+            <field
+                name="model_id"
+                ref="fleet_vehicle_inspection.model_fleet_vehicle_inspection"
+            />
+            <field
+                name="subject"
+            >Manutenção Programada: {{ object.vehicle_id.name }}</field>
             <field name="email_to">{{ object.vehicle_id.driver_id.email }}</field>
             <field name="body_html" type="html">
                 <div style="margin: 0px; padding: 0px;">
                     <p style="margin: 0px; padding: 0px; font-size: 13px;">
-                        Olá, ${object.vehicle_id.driver_id.name or ''}<br/><br/>
-                        🚙 ${object.vehicle_id.name or ''}<br/><br/>
-                        🧰 Está na hora da revisão programada de ${ctx.get('forecast_km', '')}km!<br/><br/>
-                        Data: ${ctx.get('inspection_date', '')}<br/>
-                        Hora: 7h30 às 11h<br/>
-                        Local: Centro Automotivo Costa Cabral<br/><br/>
-                        Itens de manutenção programados:<br/>
+                        Olá, ${object.vehicle_id.driver_id.name or ''}<br /><br />
+                        🚙 ${object.vehicle_id.name or ''}<br /><br />
+                        🧰 Está na hora da revisão programada de ${ctx.get('forecast_km', '')}km!<br
+                        /><br />
+                        Data: ${ctx.get('inspection_date', '')}<br />
+                        Hora: 7h30 às 11h<br />
+                        Local: Centro Automotivo Costa Cabral<br /><br />
+                        Itens de manutenção programados:<br />
                         <ul>
                             % for item in ctx.get('inspection_items', []):
                                 <li>${item.name}</li>
                             % endfor
                         </ul>
-                        <br/>
+                        <br />
                         <b>Confirme já!</b>
                     </p>
                 </div>
             </field>
-            <field name="auto_delete" eval="True"/>
+            <field name="auto_delete" eval="True" />
         </record>
     </data>
 </odoo>

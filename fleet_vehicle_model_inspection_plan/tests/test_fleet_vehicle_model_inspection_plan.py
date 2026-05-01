@@ -37,16 +37,10 @@ class TestFleetVehicleModelInspectionPlan(SavepointCase):
 
     def test_model_one2many_relation(self):
         plan_oil = self.InspectionPlan.create(
-            {
-                "model_id": self.model.id,
-                "item_id": self.item_oil.id,
-            }
+            {"model_id": self.model.id, "item_id": self.item_oil.id,}
         )
         plan_tires = self.InspectionPlan.create(
-            {
-                "model_id": self.model.id,
-                "item_id": self.item_tires.id,
-            }
+            {"model_id": self.model.id, "item_id": self.item_tires.id,}
         )
         self.assertIn(plan_oil, self.model.inspection_plan_ids)
         self.assertIn(plan_tires, self.model.inspection_plan_ids)
@@ -54,10 +48,7 @@ class TestFleetVehicleModelInspectionPlan(SavepointCase):
 
     def test_defaults(self):
         plan = self.InspectionPlan.create(
-            {
-                "model_id": self.model.id,
-                "item_id": self.item_oil.id,
-            }
+            {"model_id": self.model.id, "item_id": self.item_oil.id,}
         )
         # Check defaults defined in the model
         self.assertEqual(plan.interval_km, 10000)

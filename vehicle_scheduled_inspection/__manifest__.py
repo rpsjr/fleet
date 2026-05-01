@@ -12,9 +12,6 @@
         "vehicle_parts_catalogue",
         "meta_whatsapp",
     ],
-    "data": [
-        "data/cron_data.xml",
-        "data/mail_template_data.xml",
-    ],
+    "data": ["data/cron_data.xml", "data/mail_template_data.xml",],
     "installable": True,
 }

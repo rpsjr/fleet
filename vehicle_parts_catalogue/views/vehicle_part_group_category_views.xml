@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <!-- Group Views -->
     <record id="vehicle_part_group_view_tree" model="ir.ui.view">
@@ -6,7 +6,7 @@
         <field name="model">vehicle.part.group</field>
         <field name="arch" type="xml">
             <tree string="Vehicle Part Groups" editable="bottom">
-                <field name="name"/>
+                <field name="name" />
             </tree>
         </field>
     </record>
@@ -23,7 +23,7 @@
         <field name="model">vehicle.part.category</field>
         <field name="arch" type="xml">
             <tree string="Vehicle Part Categories" editable="bottom">
-                <field name="name"/>
+                <field name="name" />
             </tree>
         </field>
     </record>
