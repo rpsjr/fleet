@@ -1,4 +1,6 @@
 from dateutil.relativedelta import relativedelta
+from datetime import datetime, time
+import pytz
 
 from odoo import _, api, fields, models
 
@@ -31,11 +33,13 @@ class FleetVehicle(models.Model):
         vehicles = self.search([("active", "=", True)])
         today = fields.Date.today()
 
-        def next_business_day(date):
+        tz = pytz.timezone('America/Sao_Paulo')
+        def next_business_day_8am(date):
             next_date = date + relativedelta(days=1)
             while next_date.weekday() >= 5:  # 5: Saturday, 6: Sunday
                 next_date += relativedelta(days=1)
-            return next_date
+            local_dt = tz.localize(datetime.combine(next_date, time(8, 0)))
+            return local_dt.astimezone(pytz.utc).replace(tzinfo=None)
 
         for vehicle in vehicles:
             if not vehicle.model_id or not vehicle.driver_id:
@@ -54,6 +58,7 @@ class FleetVehicle(models.Model):
 
             items_7d = []
             items_14d = []
+            trigger_inspection = False
 
             for plan in plans:
                 last_line = self.env["fleet.vehicle.inspection.line"].search(
@@ -75,25 +80,48 @@ class FleetVehicle(models.Model):
 
                 if forecast_7d >= target_km:
                     items_7d.append(plan.item_id)
+                    if plan.criticality == 'alta':
+                        trigger_inspection = True
                 elif forecast_14d >= target_km:
                     items_14d.append(plan.item_id)
 
-            if items_7d:
-                inspection_date = next_business_day(today)
-                all_items = items_7d + items_14d
-                unique_items = list(set(all_items))
+            if not trigger_inspection:
+                continue
 
-                parts = self.env["vehicle.part"].search(
-                    [
-                        ("vehicle_model_id", "=", vehicle.model_id.id),
-                        ("inspection_item_id", "in", [i.id for i in unique_items]),
-                    ]
-                )
+            all_lines = self.env["fleet.vehicle.inspection.line"].search(
+                [
+                    ("inspection_id.vehicle_id", "=", vehicle.id),
+                    ("inspection_id.state", "!=", "cancel"),
+                ],
+                order="create_date desc"
+            )
+            
+            seen_items = set()
+            failed_items = []
+            for line in all_lines:
+                if line.inspection_item_id.id not in seen_items:
+                    seen_items.add(line.inspection_item_id.id)
+                    if line.result == 'failure':
+                        failed_items.append(line.inspection_item_id)
+
+            inspection_date = next_business_day_8am(today)
+            all_items = items_7d + items_14d + list(failed_items)
+            unique_items = list(set(all_items))
+
+            if unique_items:
 
                 note_html = "<table class='table table-bordered'><thead><tr><th>Item</th><th>Código da Peça</th><th>Produtos Relacionados</th></tr></thead><tbody>"
-                for part in parts:
-                    product_names = ", ".join(part.product_ids.mapped("name"))
-                    note_html += f"<tr><td>{part.inspection_item_id.name}</td><td>{part.part_number}</td><td>{product_names}</td></tr>"
+                for item in unique_items:
+                    item_parts = self.env['vehicle.part'].search([
+                        ('vehicle_model_id', '=', vehicle.model_id.id),
+                        ('inspection_item_id', '=', item.id)
+                    ])
+                    if item_parts:
+                        for part in item_parts:
+                            product_names = ", ".join(part.product_ids.mapped('name'))
+                            note_html += f"<tr><td>{item.name}</td><td>{part.part_number}</td><td>{product_names}</td></tr>"
+                    else:
+                        note_html += f"<tr><td>{item.name}</td><td>-</td><td>-</td></tr>"
                 note_html += "</tbody></table>"
 
                 inspection = self.env["fleet.vehicle.inspection"].create(

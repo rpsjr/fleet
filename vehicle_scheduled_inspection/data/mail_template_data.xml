@@ -7,6 +7,7 @@
             model="whatsapp.template"
         >
             <field name="name">convite_manutencao_programada</field>
+            <field name="language">pt_BR</field>
             <field
                 name="model_id"
                 ref="fleet_vehicle_inspection.model_fleet_vehicle_inspection"

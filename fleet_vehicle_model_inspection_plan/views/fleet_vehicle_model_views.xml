@@ -14,6 +14,7 @@
                             <field name="item_id" />
                             <field name="interval_km" />
                             <field name="interval_months" />
+                            <field name="criticality" />
                         </tree>
                     </field>
                 </page>
@@ -31,6 +32,7 @@
                 <field name="item_id" />
                 <field name="interval_km" />
                 <field name="interval_months" />
+                <field name="criticality" />
             </tree>
         </field>
     </record>
@@ -46,6 +48,7 @@
                         <group>
                             <field name="model_id" />
                             <field name="item_id" />
+                            <field name="criticality" />
                         </group>
                         <group>
                             <field name="interval_km" />
