@@ -15,6 +15,7 @@
                                 <field name="qty"/>
                                 <field name="group_id"/>
                                 <field name="category_id"/>
+                                <field name="product_ids" widget="many2many_tags"/>
                             </tree>
                         </field>
                     </page>
