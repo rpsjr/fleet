@@ -3,6 +3,7 @@
     "version": "13.0.1.0.0",
     "category": "Fleet",
     "summary": "Manage vehicle parts catalogue",
+    "description": "Vehicle Parts Catalogue",
     "author": "Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/fleet",
     "license": "AGPL-3",
