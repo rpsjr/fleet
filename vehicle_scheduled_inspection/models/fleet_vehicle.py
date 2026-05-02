@@ -207,6 +207,24 @@ class FleetVehicle(models.Model):
         if not phone:
             return
 
+        import json
+        components = [
+            {
+                "type": "body",
+                "parameters": [
+                    {"type": "text", "text": self.driver_id.name or " "},
+                    {"type": "text", "text": self.name or " "},
+                    {"type": "text", "text": str(int(forecast_km))},
+                    {"type": "text", "text": date.strftime("%d/%m/%Y")},
+                    {"type": "text", "text": v5},
+                    {"type": "text", "text": v6},
+                    {"type": "text", "text": v7},
+                    {"type": "text", "text": v8},
+                    {"type": "text", "text": v9},
+                ]
+            }
+        ]
+
         msg = self.env["whatsapp.message"].create(
             {
                 "body": body,
@@ -216,6 +234,7 @@ class FleetVehicle(models.Model):
                 "res_model": "fleet.vehicle.inspection",
                 "res_id": inspection.id,
                 "status": "draft",
+                "components_json": json.dumps(components),
             }
         )
         msg.action_send()
