@@ -1,6 +1,6 @@
 {
     "name": "Vehicle Parts Catalogue",
-    "version": "13.0.1.0.0",
+    "version": "13.0.1.0.1",
     "category": "Fleet",
     "summary": "Manage vehicle parts catalogue",
     "description": "Vehicle Parts Catalogue",
@@ -12,6 +12,7 @@
         "security/ir.model.access.csv",
         "data/vehicle_part_data.xml",
         "views/vehicle_part_group_category_views.xml",
+        "views/vehicle_part_specification_views.xml",
         "views/vehicle_part_views.xml",
         "views/fleet_vehicle_model_views.xml",
         "views/fleet_vehicle_views.xml",

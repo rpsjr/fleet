@@ -11,6 +11,12 @@
               action="action_vehicle_part"
               sequence="10"/>
 
+    <menuitem id="menu_vehicle_part_specification"
+              name="Part Specifications"
+              parent="menu_vehicle_parts_catalogue_config"
+              action="action_vehicle_part_specification"
+              sequence="15"/>
+
     <menuitem id="menu_vehicle_part_group"
               name="Part Groups"
               parent="menu_vehicle_parts_catalogue_config"

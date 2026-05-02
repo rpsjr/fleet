@@ -7,14 +7,12 @@ class VehiclePart(models.Model):
     vehicle_model_id = fields.Many2one("fleet.vehicle.model", string="Vehicle Model", required=True)
     inspection_item_id = fields.Many2one("fleet.vehicle.inspection.item", string="Inspection Item", required=True)
     name = fields.Char(related="vehicle_model_id.name", store=True, readonly=True, string="Model Name")
-    part_number = fields.Char(string="Código da Peça", required=True)
+    specification_id = fields.Many2one("vehicle.part.specification", string="Especificação", required=True)
+    part_number = fields.Char(related="specification_id.name", string="Código da Peça", store=True)
     qty = fields.Integer(string="Quantidade Aplicada", default=1)
-    group_id = fields.Many2one("vehicle.part.group", string="Group")
-    category_id = fields.Many2one("vehicle.part.category", string="Category")
+    group_id = fields.Many2one("vehicle.part.group", related="specification_id.group_id", string="Group", store=True)
+    category_id = fields.Many2one("vehicle.part.category", related="specification_id.category_id", string="Category", store=True)
     product_ids = fields.Many2many(
-        "product.template",
-        "vehicle_part_product_rel",
-        "part_id",
-        "product_id",
+        related="specification_id.product_ids",
         string="Products",
     )

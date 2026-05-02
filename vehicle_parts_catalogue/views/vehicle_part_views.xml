@@ -7,7 +7,7 @@
             <tree string="Vehicle Parts">
                 <field name="vehicle_model_id"/>
                 <field name="inspection_item_id"/>
-                <field name="part_number"/>
+                <field name="specification_id"/>
                 <field name="qty"/>
                 <field name="group_id"/>
                 <field name="category_id"/>
@@ -31,7 +31,7 @@
                         <group>
                             <field name="vehicle_model_id"/>
                             <field name="inspection_item_id"/>
-                            <field name="part_number"/>
+                            <field name="specification_id"/>
                             <field name="qty"/>
                         </group>
                         <group>
@@ -56,7 +56,7 @@
             <search string="Search Vehicle Parts">
                 <field name="vehicle_model_id"/>
                 <field name="inspection_item_id"/>
-                <field name="part_number"/>
+                <field name="specification_id"/>
                 <field name="group_id"/>
                 <field name="category_id"/>
                 <group expand="0" string="Group By">

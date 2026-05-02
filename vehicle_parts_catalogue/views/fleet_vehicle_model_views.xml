@@ -11,7 +11,7 @@
                         <field name="part_ids">
                             <tree editable="bottom">
                                 <field name="inspection_item_id"/>
-                                <field name="part_number"/>
+                                <field name="specification_id"/>
                                 <field name="qty"/>
                                 <field name="group_id"/>
                                 <field name="category_id"/>
