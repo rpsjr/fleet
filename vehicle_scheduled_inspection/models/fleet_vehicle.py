@@ -59,6 +59,7 @@ class FleetVehicle(models.Model):
             items_7d = []
             items_14d = []
             trigger_inspection = False
+            min_target_km = float('inf')
 
             for plan in plans:
                 last_line = self.env["fleet.vehicle.inspection.line"].search(
@@ -80,6 +81,8 @@ class FleetVehicle(models.Model):
 
                 if forecast_7d >= target_km:
                     items_7d.append(plan.item_id)
+                    if target_km < min_target_km:
+                        min_target_km = target_km
                     if plan.criticality == 'alta':
                         trigger_inspection = True
                 elif forecast_14d >= target_km:
@@ -87,6 +90,8 @@ class FleetVehicle(models.Model):
 
             if not trigger_inspection:
                 continue
+
+            communicated_km = min_target_km if min_target_km != float('inf') else forecast_7d
 
             all_lines = self.env["fleet.vehicle.inspection.line"].search(
                 [
@@ -139,10 +144,10 @@ class FleetVehicle(models.Model):
                 inspection.message_subscribe(partner_ids=[vehicle.driver_id.id])
 
                 vehicle._send_whatsapp_invite(
-                    inspection, unique_items, forecast_7d, inspection_date
+                    inspection, unique_items, communicated_km, inspection_date
                 )
                 vehicle._send_email_invite(
-                    inspection, unique_items, forecast_7d, inspection_date
+                    inspection, unique_items, communicated_km, inspection_date
                 )
 
     def _send_whatsapp_invite(self, inspection, items, forecast_km, date):
