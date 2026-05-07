@@ -34,11 +34,14 @@ class FleetVehicle(models.Model):
         today = fields.Date.today()
 
         tz = pytz.timezone('America/Sao_Paulo')
-        def next_business_day_8am(date):
-            next_date = date + relativedelta(days=1)
-            while next_date.weekday() >= 5:  # 5: Saturday, 6: Sunday
-                next_date += relativedelta(days=1)
-            local_dt = tz.localize(datetime.combine(next_date, time(8, 0)))
+        def exact_date_8am(date, days_to_add):
+            exact_date = date + relativedelta(days=int(days_to_add))
+            
+            # Se cair no final de semana, empurra para o próximo dia útil (segunda-feira)
+            while exact_date.weekday() >= 5:  # 5: Saturday, 6: Sunday
+                exact_date += relativedelta(days=1)
+                
+            local_dt = tz.localize(datetime.combine(exact_date, time(8, 0)))
             return local_dt.astimezone(pytz.utc).replace(tzinfo=None)
 
         for vehicle in vehicles:
@@ -109,25 +112,32 @@ class FleetVehicle(models.Model):
                     if line.result == 'failure':
                         failed_items.append(line.inspection_item_id)
 
-            inspection_date = next_business_day_8am(today)
+            if avg_daily_km > 0 and min_target_km != float('inf'):
+                days_to_add = max(0, (min_target_km - current_odometer) / avg_daily_km)
+            else:
+                days_to_add = 0
+
+            inspection_date = exact_date_8am(today, days_to_add)
             all_items = items_7d + items_14d + list(failed_items)
             unique_items = list(set(all_items))
 
             if unique_items:
 
-                note_html = "<table class='table table-bordered'><thead><tr><th>Item</th><th>Código da Peça</th><th>Produtos Relacionados</th></tr></thead><tbody>"
+                rows_html = ""
                 for item in unique_items:
                     item_parts = self.env['vehicle.part'].search([
                         ('vehicle_model_id', '=', vehicle.model_id.id),
                         ('inspection_item_id', '=', item.id)
                     ])
-                    if item_parts:
-                        for part in item_parts:
+                    for part in item_parts:
+                        if part.part_number:
                             product_names = ", ".join(part.product_ids.mapped('name'))
-                            note_html += f"<tr><td>{item.name}</td><td>{part.part_number}</td><td>{product_names}</td></tr>"
-                    else:
-                        note_html += f"<tr><td>{item.name}</td><td>-</td><td>-</td></tr>"
-                note_html += "</tbody></table>"
+                            rows_html += f"<tr><td>{item.name}</td><td>{part.part_number}</td><td>{product_names}</td></tr>"
+
+                if rows_html:
+                    note_html = "<table class='table table-bordered'><thead><tr><th>Item</th><th>Código da Peça</th><th>Produtos Relacionados</th></tr></thead><tbody>" + rows_html + "</tbody></table>"
+                else:
+                    note_html = ""
 
                 inspection = self.env["fleet.vehicle.inspection"].create(
                     {
