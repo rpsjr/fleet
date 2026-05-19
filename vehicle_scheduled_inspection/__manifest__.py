@@ -1,6 +1,6 @@
 {
     "name": "Vehicle Scheduled Inspection",
-    "version": "13.0.1.2.0",
+    "version": "13.0.1.3.0",
     "category": "Fleet",
     "summary": "Schedule vehicle inspections based on maintenance plan.",
     "author": "Odoo Community Association (OCA)",

@@ -42,6 +42,14 @@ class FleetVehicle(models.Model):
                 exact_date += relativedelta(days=1)
                 
             local_dt = tz.localize(datetime.combine(exact_date, time(8, 0)))
+            now_local = datetime.now(pytz.utc).astimezone(tz)
+            
+            if local_dt <= now_local:
+                exact_date = now_local.date() + relativedelta(days=1)
+                while exact_date.weekday() >= 5:
+                    exact_date += relativedelta(days=1)
+                local_dt = tz.localize(datetime.combine(exact_date, time(8, 0)))
+
             return local_dt.astimezone(pytz.utc).replace(tzinfo=None)
 
         for vehicle in vehicles:
@@ -63,6 +71,7 @@ class FleetVehicle(models.Model):
             items_14d = []
             trigger_inspection = False
             min_target_km = float('inf')
+            trigger_item_name = ""
 
             for plan in plans:
                 last_line = self.env["fleet.vehicle.inspection.line"].search(
@@ -84,10 +93,11 @@ class FleetVehicle(models.Model):
 
                 if forecast_7d >= target_km:
                     items_7d.append(plan.item_id)
-                    if target_km < min_target_km:
-                        min_target_km = target_km
                     if plan.criticality == 'alta':
                         trigger_inspection = True
+                        if target_km < min_target_km:
+                            min_target_km = target_km
+                            trigger_item_name = plan.item_id.name
                 elif forecast_14d >= target_km:
                     items_14d.append(plan.item_id)
 
@@ -139,6 +149,18 @@ class FleetVehicle(models.Model):
                 else:
                     note_html = ""
 
+                trigger_info = ""
+                if trigger_item_name:
+                    remaining_km = min_target_km - current_odometer
+                    val_alvo = "{:,.2f}".format(min_target_km).replace(',', 'X').replace('.', ',').replace('X', '.')
+                    val_faltam = "{:,.2f}".format(remaining_km).replace(',', 'X').replace('.', ',').replace('X', '.')
+                    
+                    trigger_info = (
+                        f"<p><strong>Item crítico disparador:</strong> {trigger_item_name}<br/>"
+                        f"<strong>KM Alvo:</strong> {val_alvo}<br/>"
+                        f"<strong>Faltam:</strong> {val_faltam} km</p>"
+                    )
+
                 inspection = self.env["fleet.vehicle.inspection"].create(
                     {
                         "vehicle_id": vehicle.id,
@@ -150,6 +172,9 @@ class FleetVehicle(models.Model):
                         ],
                     }
                 )
+
+                if trigger_info:
+                    inspection.message_post(body=trigger_info)
 
                 inspection.message_subscribe(partner_ids=[vehicle.driver_id.id])
 
