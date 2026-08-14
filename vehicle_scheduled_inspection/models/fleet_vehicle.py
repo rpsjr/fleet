@@ -142,10 +142,10 @@ class FleetVehicle(models.Model):
                     for part in item_parts:
                         if part.part_number:
                             product_names = ", ".join(part.product_ids.mapped('name'))
-                            rows_html += f"<tr><td>{item.name}</td><td>{part.part_number}</td><td>{product_names}</td></tr>"
+                            rows_html += f"<tr><td>{item.name}</td><td>{part.part_number}</td><td>{part.qty}</td><td>{product_names}</td></tr>"
 
                 if rows_html:
-                    note_html = "<table class='table table-bordered'><thead><tr><th>Item</th><th>Código da Peça</th><th>Produtos Relacionados</th></tr></thead><tbody>" + rows_html + "</tbody></table>"
+                    note_html = "<table class='table table-bordered'><thead><tr><th>Item</th><th>Código da Peça</th><th>Quantidade</th><th>Produtos Relacionados</th></tr></thead><tbody>" + rows_html + "</tbody></table>"
                 else:
                     note_html = ""
 
