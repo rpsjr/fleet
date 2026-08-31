@@ -105,11 +105,20 @@ class EfrotasClient:
                 if self.certificate_password
                 else None
             )
-            private_key, certificate, additional_certificates = (
-                pkcs12.load_key_and_certificates(
-                    self.certificate_data, pwd_bytes
+            try:
+                from cryptography.hazmat.backends import default_backend
+
+                private_key, certificate, additional_certificates = (
+                    pkcs12.load_key_and_certificates(
+                        self.certificate_data, pwd_bytes, default_backend()
+                    )
                 )
-            )
+            except (TypeError, ImportError):
+                private_key, certificate, additional_certificates = (
+                    pkcs12.load_key_and_certificates(
+                        self.certificate_data, pwd_bytes
+                    )
+                )
 
             cert_pem = certificate.public_bytes(Encoding.PEM)
             if additional_certificates:
