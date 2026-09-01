@@ -44,7 +44,9 @@ class EfrotasClient:
     DEFAULT_HOMOLOGATION_URL = (
         "https://hom-efrotas.np.estaleiro.serpro.gov.br/efrotas/api"
     )
-    DEFAULT_PRODUCTION_URL = "https://efrotas.serpro.gov.br/efrotas/api"
+    DEFAULT_PRODUCTION_URL = (
+        "https://efrotas.estaleiro.serpro.gov.br/efrotas/api"
+    )
 
     def __init__(
         self,
