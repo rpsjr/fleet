@@ -186,16 +186,30 @@ class EfrotasConfig(models.Model):
         client = self.get_client()
 
         try:
-            # Em homologação, testa consultando a frota ou a placa de teste SAV0741
-            test_plate = "SAV0741"
-            res = client.get_veiculo_por_placa(test_plate)
-            placa_retornada = (
-                res.get("placa") if isinstance(res, dict) else str(res)
-            )
-
-            msg = _("Conexão estabelecida com sucesso! Veículo de teste: %s") % (
-                placa_retornada or test_plate
-            )
+            if self.environment == "homologation":
+                test_plate = "SAV0741"
+                res = client.get_veiculo_por_placa(test_plate)
+                placa_retornada = (
+                    res.get("placa") if isinstance(res, dict) else str(res)
+                )
+                msg = _(
+                    "Conexão estabelecida com sucesso em Homologação! Veículo de teste: %s"
+                ) % (placa_retornada or test_plate)
+            else:
+                # Em produção, consulta a frota vinculada ao CNPJ do certificado
+                res = client.get_veiculos(
+                    cnpj_filial=self.cnpj_filial, pagina=1, quantidade=1
+                )
+                total = 0
+                if isinstance(res, dict):
+                    total = (
+                        res.get("totalRegistros")
+                        or res.get("totalElementos")
+                        or len(res.get("veiculos", []))
+                    )
+                msg = _(
+                    "Conexão estabelecida com sucesso em Produção com o certificado digital! (Veículos na frota: %s)"
+                ) % total
             self.write(
                 {
                     "last_test_date": fields.Datetime.now(),
