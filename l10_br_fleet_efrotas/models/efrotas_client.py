@@ -100,23 +100,33 @@ class EfrotasClient:
                 pkcs12,
             )
 
+            import base64
+
+            cert_data = self.certificate_data
+            if isinstance(cert_data, str):
+                try:
+                    cert_data = base64.b64decode(cert_data)
+                except Exception:
+                    cert_data = cert_data.encode("latin1")
+
             pwd_bytes = (
                 self.certificate_password.encode("utf-8")
-                if self.certificate_password
-                else None
+                if isinstance(self.certificate_password, str)
+                else self.certificate_password
             )
+
             try:
                 from cryptography.hazmat.backends import default_backend
 
                 private_key, certificate, additional_certificates = (
                     pkcs12.load_key_and_certificates(
-                        self.certificate_data, pwd_bytes, default_backend()
+                        cert_data, pwd_bytes, default_backend()
                     )
                 )
-            except (TypeError, ImportError):
+            except TypeError:
                 private_key, certificate, additional_certificates = (
                     pkcs12.load_key_and_certificates(
-                        self.certificate_data, pwd_bytes
+                        cert_data, pwd_bytes
                     )
                 )
 
