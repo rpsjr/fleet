@@ -233,18 +233,43 @@ class FleetVehicle(models.Model):
                 vehicle.write(vals)
 
             except EfrotasException as ex:
-                vehicle.write(
-                    {
-                        "efrotas_last_status_msg": _(
-                            "Erro na sincronização: %s"
-                        )
-                        % str(ex)
-                    }
-                )
-                raise UserError(
-                    _("Erro ao consultar e-Frotas para o veículo %s: %s")
-                    % (vehicle.name or vehicle.license_plate, str(ex))
-                )
+                msg = _("Falha na sincronização com e-Frotas: %s") % str(ex)
+                _logger.warning("Erro ao sincronizar veículo %s: %s", vehicle.license_plate, msg)
+                vehicle.write({"efrotas_last_status_msg": msg})
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params": {
+                        "title": _("Falha na Sincronização"),
+                        "message": _("Erro ao consultar e-Frotas para o veículo %s: %s")
+                        % (vehicle.name or vehicle.license_plate, str(ex)),
+                        "type": "danger",
+                        "sticky": True,
+                        "next": {
+                            "type": "ir.actions.client",
+                            "tag": "reload",
+                        },
+                    },
+                }
+            except Exception as ex:
+                msg = _("Erro inesperado na sincronização: %s") % str(ex)
+                _logger.exception("Erro inesperado ao sincronizar veículo %s: %s", vehicle.license_plate, msg)
+                vehicle.write({"efrotas_last_status_msg": msg})
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params": {
+                        "title": _("Erro na Sincronização"),
+                        "message": _("Erro inesperado para o veículo %s: %s")
+                        % (vehicle.name or vehicle.license_plate, str(ex)),
+                        "type": "danger",
+                        "sticky": True,
+                        "next": {
+                            "type": "ir.actions.client",
+                            "tag": "reload",
+                        },
+                    },
+                }
 
         return {
             "type": "ir.actions.client",
@@ -256,6 +281,10 @@ class FleetVehicle(models.Model):
                 ),
                 "type": "success",
                 "sticky": False,
+                "next": {
+                    "type": "ir.actions.client",
+                    "tag": "reload",
+                },
             },
         }
 
@@ -338,9 +367,45 @@ class FleetVehicle(models.Model):
                     "message": msg,
                     "type": "info" if is_associated else "warning",
                     "sticky": False,
+                    "next": {
+                        "type": "ir.actions.client",
+                        "tag": "reload",
+                    },
                 },
             }
         except EfrotasException as ex:
-            raise UserError(
-                _("Erro ao verificar associação no e-Frotas: %s") % str(ex)
-            )
+            msg = _("Erro ao verificar associação no e-Frotas: %s") % str(ex)
+            _logger.warning("Erro ao checar associação placa %s: %s", placa, msg)
+            self.write({"efrotas_last_status_msg": msg})
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": _("Erro na Associação"),
+                    "message": msg,
+                    "type": "danger",
+                    "sticky": True,
+                    "next": {
+                        "type": "ir.actions.client",
+                        "tag": "reload",
+                    },
+                },
+            }
+        except Exception as ex:
+            msg = _("Erro inesperado ao verificar associação: %s") % str(ex)
+            _logger.exception("Erro inesperado ao checar associação placa %s: %s", placa, msg)
+            self.write({"efrotas_last_status_msg": msg})
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": _("Erro na Associação"),
+                    "message": msg,
+                    "type": "danger",
+                    "sticky": True,
+                    "next": {
+                        "type": "ir.actions.client",
+                        "tag": "reload",
+                    },
+                },
+            }
