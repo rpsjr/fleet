@@ -109,25 +109,28 @@ class EfrotasClient:
                 except Exception:
                     cert_data = cert_data.encode("latin1")
 
-            pwd_bytes = (
-                self.certificate_password.encode("utf-8")
-                if isinstance(self.certificate_password, str)
-                else self.certificate_password
+            pwd_bytes = None
+            if self.certificate_password:
+                if isinstance(self.certificate_password, str):
+                    pwd_bytes = self.certificate_password.encode("utf-8")
+                elif isinstance(self.certificate_password, bytes):
+                    pwd_bytes = self.certificate_password
+
+            from cryptography.hazmat.backends import default_backend
+
+            private_key, certificate, additional_certificates = (
+                pkcs12.load_key_and_certificates(
+                    cert_data, pwd_bytes, default_backend()
+                )
             )
 
-            try:
-                from cryptography.hazmat.backends import default_backend
-
-                private_key, certificate, additional_certificates = (
-                    pkcs12.load_key_and_certificates(
-                        cert_data, pwd_bytes, default_backend()
-                    )
+            if not certificate:
+                raise EfrotasAuthError(
+                    "O arquivo PKCS#12 (.pfx/.p12) não contém um certificado público válido."
                 )
-            except TypeError:
-                private_key, certificate, additional_certificates = (
-                    pkcs12.load_key_and_certificates(
-                        cert_data, pwd_bytes
-                    )
+            if not private_key:
+                raise EfrotasAuthError(
+                    "O arquivo PKCS#12 (.pfx/.p12) não contém uma chave privada válida."
                 )
 
             cert_pem = certificate.public_bytes(Encoding.PEM)
