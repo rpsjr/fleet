@@ -94,7 +94,7 @@ class EfrotasConfig(models.Model):
     last_test_date = fields.Datetime(
         string="Último Teste de Conexão", readonly=True
     )
-    last_test_result = fields.Char(
+    last_test_result = fields.Text(
         string="Resultado do Último Teste", readonly=True
     )
     last_test_status = fields.Selection(
@@ -225,10 +225,15 @@ class EfrotasConfig(models.Model):
                     "message": msg,
                     "type": "success",
                     "sticky": False,
+                    "next": {
+                        "type": "ir.actions.client",
+                        "tag": "reload",
+                    },
                 },
             }
         except EfrotasException as ex:
             msg = _("Falha na conexão com e-Frotas: %s") % str(ex)
+            _logger.warning("Falha no teste de conexão e-Frotas: %s", msg)
             self.write(
                 {
                     "last_test_date": fields.Datetime.now(),
@@ -236,9 +241,23 @@ class EfrotasConfig(models.Model):
                     "last_test_status": "failed",
                 }
             )
-            raise UserError(msg)
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": _("Falha no Teste de Conexão"),
+                    "message": msg,
+                    "type": "danger",
+                    "sticky": True,
+                    "next": {
+                        "type": "ir.actions.client",
+                        "tag": "reload",
+                    },
+                },
+            }
         except Exception as ex:
             msg = _("Erro inesperado ao testar conexão: %s") % str(ex)
+            _logger.exception("Erro inesperado no teste de conexão e-Frotas: %s", msg)
             self.write(
                 {
                     "last_test_date": fields.Datetime.now(),
@@ -246,4 +265,17 @@ class EfrotasConfig(models.Model):
                     "last_test_status": "failed",
                 }
             )
-            raise UserError(msg)
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": _("Erro no Teste de Conexão"),
+                    "message": msg,
+                    "type": "danger",
+                    "sticky": True,
+                    "next": {
+                        "type": "ir.actions.client",
+                        "tag": "reload",
+                    },
+                },
+            }
