@@ -8,7 +8,7 @@
         Consultas de veículos, CRLV-e digital, infrações, restrições RENAJUD,
         roubo/furto, recall, webhooks e transações (indicação de condutor, boletos).
     """,
-    "version": "13.0.1.0.0",
+    "version": "13.0.1.1.0",
     "category": "Human Resources/Fleet",
     "author": "Fleet Contributors, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/fleet",
