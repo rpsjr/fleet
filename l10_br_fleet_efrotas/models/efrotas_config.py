@@ -198,18 +198,64 @@ class EfrotasConfig(models.Model):
             else:
                 # Em produção, consulta a frota vinculada ao CNPJ do certificado
                 res = client.get_veiculos(
-                    cnpj_filial=self.cnpj_filial, pagina=1, quantidade=1
+                    cnpj_filial=self.cnpj_filial, pagina=1, quantidade=20
                 )
                 total = 0
-                if isinstance(res, dict):
+                sample_plates = []
+
+                if isinstance(res, list):
+                    total = len(res)
+                    sample_plates = [
+                        v.get("placa")
+                        for v in res
+                        if isinstance(v, dict) and v.get("placa")
+                    ]
+                elif isinstance(res, dict):
+                    items = (
+                        res.get("veiculos")
+                        or res.get("content")
+                        or res.get("itens")
+                        or res.get("dados")
+                        or res.get("frota")
+                        or []
+                    )
+                    if isinstance(items, list):
+                        sample_plates = [
+                            v.get("placa")
+                            for v in items
+                            if isinstance(v, dict) and v.get("placa")
+                        ]
+
                     total = (
                         res.get("totalRegistros")
                         or res.get("totalElementos")
-                        or len(res.get("veiculos", []))
+                        or res.get("totalElements")
+                        or res.get("total")
+                        or res.get("count")
+                        or res.get("total_registros")
+                        or res.get("qtdRegistros")
+                        or res.get("quantidade")
+                        or (
+                            isinstance(res.get("page"), dict)
+                            and res["page"].get("totalElements")
+                        )
+                        or (
+                            isinstance(res.get("paginacao"), dict)
+                            and res["paginacao"].get("totalRegistros")
+                        )
+                        or len(items)
                     )
+
+                details = f"Veículos encontrados: {total}"
+                if sample_plates:
+                    plates_str = ", ".join(sample_plates[:5])
+                    if len(sample_plates) > 5:
+                        plates_str += f" (+{len(sample_plates) - 5})"
+                    details += f" | Placas de amostra: {plates_str}"
+
                 msg = _(
-                    "Conexão estabelecida com sucesso em Produção com o certificado digital! (Veículos na frota: %s)"
-                ) % total
+                    "Conexão estabelecida com sucesso em Produção com o certificado digital! (%s)"
+                ) % details
             self.write(
                 {
                     "last_test_date": fields.Datetime.now(),
